@@ -1,58 +1,30 @@
-//import {createStore} from'redux';
+"use strict";
 
-const counter = (state=0, action) =>{
+var should = require('should');
+
+var counter = (state=0, action) =>{
+    // if(state === undefined){
+    //     state = 0;
+    // }
     switch(action.type){
         case 'INCREASE':
             return state+1;
         case 'DECREASE':
             return state-1;
         default:
-            return state; 
+            return state;
     }
 }
 
-const createStore = (reducer) => {
-    let state;
-    let list = [];
-    const getState = () =>{
-        return state;
-    }
-    const dispatch = (action) => {
-        state = reducer(state, action);
-        list.forEach((fn)=>{
-            fn();
-        })
-    }
-    const subscribe = (fn) => {
-        list.push(fn);
-        return () => {
-            list = list.filter(cb => cb != fn)
-        }
-    }
-    return {
-        getState,
-        subscribe,
-        dispatch
-    }
-}
+should(counter(0,{
+    type:'DECREASE'
+})).be.equal(-1);
 
-const store = createStore(counter);
-store.dispatch({
-    type:'INIT',
-})
 
-const render = () => {
-    document.getElementsByTagName('body')[0].innerHTML='<h1>'+store.getState()+'</h1>'
-}
+counter(0,{
+    type:'INCREASE'
+}).should.be.equal(1);
 
-const unsubsribe = store.subscribe(render);
+counter(undefined,{}).should.be.equal(0);
 
-render();
-
-document.addEventListener('click', () => {
-    console.log('dispatch INCREASE')
-    store.dispatch({
-        type:'INCREASE',
-    })
-    unsubsribe();
-})
+console.log('pass test');
