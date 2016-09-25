@@ -1,50 +1,65 @@
 import {createStore} from'redux';
 import React,{Component} from'react';
 import ReactDom from 'react-dom';
+import rootReducer from './reducers';
 
 let gid = 0;
+let store = createStore(rootReducer);
+console.log(store.getState());
 
-const todos = (state = [], action) =>{
-    switch(action.type){
-        case 'ADD_TODO':
-            return [...state, {
-                id:++gid,
-                text: action.text,
-                completed:false,
-            }]
-            // var newState = [].concat(state)
-            // push('freijhfbruei');
-        case 'TOGGLE_TODO':
-            return state.map((todo) => {
-                if(todo.id == action.id){
-                    return Object.assign({},todo,{
-                        completed: !todo.completed
+class App extends Component {
+    render(){
+        const state = store.getState();
+        console.log(state);
+        const todos = state.todos;
+        return <div>
+            <input type="text" ref="_input"/>
+            <button 
+                onClick={() => {
+                    store.dispatch({
+                        type: 'ADD_TODO',
+                        text: this.refs._input.value
                     })
-                }
-                return todo;
-            })
-        default :
-            return state;
+                }}>
+                Add
+            </button>
+            <ul>
+               {todos.map((todo) =>{
+                    return(
+                        <li 
+                            style={{
+                                textDecoration:todo.completed?'line-through':'none'
+                            }}
+                            key={todo.id}
+                            onClick={() =>{
+                                store.dispatch({
+                                    type:'TOGGLE_TODO',
+                                    id: todo.id
+                                })
+                            }}>
+                            {todo.text}
+                        </li>
+                    )
+                })}
+            </ul>
+            <span>Show all</span>{' '}
+            <a href="#">Show completed</a>{' '}
+            <a href="#">Show active</a>{' '}
+        </div>
     }
 }
 
-let store = createStore(todos);
 
+const render = () => {
+    
+    ReactDom.render(
+        <App />,
+        document.getElementById("root")
+    )
+}
+render();
 
-store.dispatch({
-    type:'ADD_TODO',
-    text:'Mango'
-})
-console.log(store.getState());
-
-console.log('dispatch TOGGLE_TODO')
-
-store.dispatch({
-    type:'TOGGLE_TODO',
-    id:1
-})
-
-console.log(store.getState());
+store.subscribe(render);
 
 
 
