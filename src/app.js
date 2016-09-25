@@ -2,50 +2,49 @@ import {createStore} from'redux';
 import React,{Component} from'react';
 import ReactDom from 'react-dom';
 
-const counter = (state=0, action) => {
-    switch(action.type) {
-        case 'INCREASE':
-            return state+1;
-        case 'DECREASE':
-            return state-1;
-        default:
-            return state; 
+let gid = 0;
+
+const todos = (state = [], action) =>{
+    switch(action.type){
+        case 'ADD_TODO':
+            return [...state, {
+                id:++gid,
+                text: action.text,
+                completed:false,
+            }]
+            // var newState = [].concat(state)
+            // push('freijhfbruei');
+        case 'TOGGLE_TODO':
+            return state.map((todo) => {
+                if(todo.id == action.id){
+                    return Object.assign({},todo,{
+                        completed: !todo.completed
+                    })
+                }
+                return todo;
+            })
+        default :
+            return state;
     }
 }
 
-const store = createStore(counter);
+let store = createStore(todos);
 
 
-class Counter extends Component{
-    render() {
-        console.log('rerender');
-        return(
-            <div>
-                <h1>{store.getState()}</h1>
-                <button onClick={() =>{
-                    store.dispatch({
-                        type:'DECREASE'
-                    })
-                }}>-</button>
-                <button onClick={() =>{
-                    store.dispatch({
-                        type:'INCREASE'
-                    })
-                }}
-                >+</button>
-            </div>
-        )
-    }
-}
+store.dispatch({
+    type:'ADD_TODO',
+    text:'Mango'
+})
+console.log(store.getState());
+
+console.log('dispatch TOGGLE_TODO')
+
+store.dispatch({
+    type:'TOGGLE_TODO',
+    id:1
+})
+
+console.log(store.getState());
 
 
-const render = () => {
-    ReactDom.render(
-        <Counter />,
-        document.getElementById('root')
-    )
-}
 
-render();
-
-const unsubsribe = store.subscribe(render);
